@@ -2,6 +2,7 @@ import 'package:civicsnap_android/components/error_snackbar.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:civicsnap_android/services/login_services.dart';
+import 'package:go_router/go_router.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -86,7 +87,7 @@ class _HomePageState extends State<HomePage> {
                           title: "Report Issue",
                           color: Colors.redAccent,
                           onTap: () {
-                            // TODO: Navigate to report page
+                            context.go("/report");
                           },
                         ),
                         _homeCard(
