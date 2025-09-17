@@ -135,20 +135,23 @@ class _CreateReportPageState extends State<CreateReportPage> {
         status: "Under Review",
         remarks: "N/A",
       );
-
-      await DbServices.uploadReport(report);
+      try {
+        await DbServices.uploadReport(report);
+      } on Exception catch (e, _) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text(
+              "You have already submitted a report for this issue in the last 24 hours.",
+            ),
+          ),
+        );
+      }
 
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text("Report submitted successfully!")),
         );
         context.go("/");
-      }
-    } catch (e) {
-      if (mounted) {
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(SnackBar(content: Text("Error: ${e.toString()}")));
       }
     }
 
