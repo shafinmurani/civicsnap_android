@@ -15,91 +15,103 @@ class _LoginPageState extends State<LoginPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: Container(
-        width: double.infinity,
-        height: double.infinity,
         decoration: const BoxDecoration(
           gradient: LinearGradient(
-            colors: [Color(0xFF4CAF50), Color(0xFF81C784)], // green gradient
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
+            colors: [Color(0xFF4CAF50), Color(0xFF66BB6A)],
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
           ),
         ),
         child: SafeArea(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              // Logo + tagline
-              Column(
-                children: [
-                  const SizedBox(height: 60),
-                  Icon(
-                    Icons.location_on_rounded,
-                    size: 80,
-                    color: Colors.white,
-                  ),
-                  const SizedBox(height: 20),
-                  Text(
-                    "CivicSnap",
-                    style: GoogleFonts.poppins(
-                      fontSize: 32,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.white,
+          child: Padding(
+            padding: const EdgeInsets.all(24.0),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                const Spacer(flex: 3),
+                // Logo Section
+                Column(
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.all(16),
+                      decoration: const BoxDecoration(
+                        color: Colors.white,
+                        shape: BoxShape.circle,
+                      ),
+                      child: const Icon(
+                        Icons.location_on,
+                        size: 60,
+                        color: Color(0xFF4CAF50),
+                      ),
                     ),
-                  ),
-                  const SizedBox(height: 10),
-                  Text(
-                    "Snap. Report. Resolve.",
-                    style: GoogleFonts.poppins(
-                      fontSize: 16,
-                      color: Colors.white70,
+                    const SizedBox(height: 24),
+                    Text(
+                      "CivicSnap",
+                      style: GoogleFonts.poppins(
+                        fontSize: 48,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.white,
+                        shadows: [
+                          Shadow(
+                            offset: const Offset(2, 2),
+                            blurRadius: 4,
+                            color: Colors.black.withOpacity(0.2),
+                          ),
+                        ],
+                      ),
                     ),
-                  ),
-                ],
-              ),
-
-              // Google Login button
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 24.0),
-                child: ElevatedButton.icon(
+                    const SizedBox(height: 8),
+                    Text(
+                      "Snap. Report. Resolve.",
+                      style: GoogleFonts.poppins(
+                        fontSize: 18,
+                        color: Colors.white.withOpacity(0.8),
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                  ],
+                ),
+                const Spacer(flex: 2),
+                // Google Login Button
+                ElevatedButton.icon(
                   onPressed: () {
                     LoginServices().signInWithGoogle(context);
                   },
                   icon: const FaIcon(
                     FontAwesomeIcons.google,
-                    color: Colors.white,
+                    color: Colors.black87,
                   ),
                   label: Text(
                     "Sign in with Google",
                     style: GoogleFonts.poppins(
                       fontSize: 18,
                       fontWeight: FontWeight.w600,
+                      color: Colors.black87,
                     ),
                   ),
                   style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.white,
+                    foregroundColor: Colors.black87,
                     minimumSize: const Size(double.infinity, 56),
-                    backgroundColor: Theme.of(
-                      context,
-                    ).colorScheme.onSecondary, // Google Blue
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(12),
                     ),
                     elevation: 5,
+                    padding: const EdgeInsets.symmetric(vertical: 12),
                   ),
                 ),
-              ),
-
-              // Footer
-              Padding(
-                padding: const EdgeInsets.all(16.0),
-                child: Text(
+                const Spacer(),
+                // Footer
+                Text(
                   "© 2025 CivicSnap",
                   style: GoogleFonts.poppins(
                     fontSize: 12,
                     color: Colors.white70,
                   ),
                 ),
-              ),
-            ],
+                const SizedBox(height: 20),
+              ],
+            ),
           ),
         ),
       ),

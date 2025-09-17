@@ -14,6 +14,7 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   User? user;
   bool isLoading = true;
+  final LoginServices _loginServices = LoginServices();
 
   @override
   void initState() {
@@ -34,14 +35,49 @@ class _HomePageState extends State<HomePage> {
       });
       showErrorSnackbar(
         context,
-        "There was an erorr while fetching your user, please try again.",
+        "There was an error while fetching your user, please try again.",
       );
     }
   }
 
+  // New method to show the confirmation dialog
+  Future<void> _showLogoutConfirmationDialog() async {
+    return showDialog<void>(
+      context: context,
+      barrierDismissible: false, // User must tap a button to close the dialog
+      builder: (BuildContext dialogContext) {
+        return AlertDialog(
+          title: const Text('Confirm Logout'),
+          content: const SingleChildScrollView(
+            child: ListBody(
+              children: <Widget>[
+                Text('Are you sure you want to log out?'),
+              ],
+            ),
+          ),
+          actions: <Widget>[
+            TextButton(
+              child: const Text('Cancel'),
+              onPressed: () {
+                Navigator.of(dialogContext).pop(); // Dismiss the dialog
+              },
+            ),
+            TextButton(
+              child: const Text('Logout'),
+              onPressed: () {
+                _loginServices.logout(context);
+                Navigator.of(dialogContext).pop(); // Dismiss the dialog
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
-    final loginServices = LoginServices();
+    final theme = Theme.of(context);
 
     return Scaffold(
       appBar: AppBar(
@@ -50,75 +86,59 @@ class _HomePageState extends State<HomePage> {
           IconButton(
             icon: const Icon(Icons.logout),
             tooltip: "Logout",
-            onPressed: () => loginServices.logout(context),
+            onPressed: _showLogoutConfirmationDialog, // Call the new method
           ),
         ],
       ),
       body: isLoading
           ? const Center(child: CircularProgressIndicator())
-          : Padding(
+          : SingleChildScrollView(
               padding: const EdgeInsets.all(24.0),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    "Welcome 👋",
-                    style: Theme.of(context).textTheme.headlineMedium,
+                    "Welcome back, ${user?.displayName?.split(' ')[0] ?? 'Guest'}!",
+                    style: theme.textTheme.titleLarge,
                   ),
-                  const SizedBox(height: 8),
+                  const SizedBox(height: 4),
                   Text(
-                    user?.displayName ?? "Guest User",
-                    style: Theme.of(context).textTheme.titleLarge,
-                  ),
-                  Text(
-                    user?.email ?? "",
-                    style: Theme.of(context).textTheme.bodyMedium,
+                    "What would you like to do today?",
+                    style: theme.textTheme.bodyMedium?.copyWith(
+                      color: theme.colorScheme.onSurface.withOpacity(0.7),
+                    ),
                   ),
                   const SizedBox(height: 32),
-                  Expanded(
-                    child: GridView.count(
-                      crossAxisCount: 2,
-                      mainAxisSpacing: 16,
-                      crossAxisSpacing: 16,
-                      children: [
-                        _homeCard(
-                          context,
-                          icon: Icons.report_problem,
-                          title: "Report Issue",
-                          color: Colors.redAccent,
-                          onTap: () {
-                            context.go("/report");
-                          },
-                        ),
-                        _homeCard(
-                          context,
-                          icon: Icons.map,
-                          title: "View Map",
-                          color: Colors.blueAccent,
-                          onTap: () {
-                            // TODO: Navigate to map page
-                          },
-                        ),
-                        _homeCard(
-                          context,
-                          icon: Icons.history,
-                          title: "My Reports",
-                          color: Colors.green,
-                          onTap: () {
-                            // TODO: Navigate to reports list
-                          },
-                        ),
-                        _homeCard(
-                          context,
-                          icon: Icons.settings,
-                          title: "Settings",
-                          color: Colors.deepPurple,
-                          onTap: () {
-                            // TODO: Navigate to settings
-                          },
-                        ),
-                      ],
-                    ),
+                  // Report Issue Card
+                  _buildFeatureCard(
+                    context,
+                    title: "Report an Issue",
+                    subtitle: "Snap a photo of a problem in your community.",
+                    icon: Icons.add_a_photo_outlined,
+                    onTap: () => context.go("/report"),
+                    iconColor: theme.colorScheme.primary,
+                  ),
+                  const SizedBox(height: 16),
+                  // My Reports Card
+                  _buildFeatureCard(
+                    context,
+                    title: "My Reports",
+                    subtitle: "View the status of your reported issues.",
+                    icon: Icons.history_outlined,
+                    onTap: () => context.go("/my-reports"),
+                    iconColor: theme.colorScheme.secondary,
+                  ),
+                  const SizedBox(height: 16),
+                  // Settings Card
+                  _buildFeatureCard(
+                    context,
+                    title: "Settings",
+                    subtitle: "Manage your account and app preferences.",
+                    icon: Icons.settings_outlined,
+                    onTap: () {
+                      // TODO: Navigate to settings
+                    },
+                    iconColor: theme.colorScheme.onSurface,
                   ),
                 ],
               ),
@@ -126,41 +146,47 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-  Widget _homeCard(
+  Widget _buildFeatureCard(
     BuildContext context, {
-    required IconData icon,
     required String title,
-    required Color color,
+    required String subtitle,
+    required IconData icon,
     required VoidCallback onTap,
+    required Color iconColor,
   }) {
-    return GestureDetector(
-      onTap: onTap,
-      child: Card(
-        elevation: 4,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-        child: Container(
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(16),
-            gradient: LinearGradient(
-              colors: [color.withOpacity(0.8), color.withOpacity(0.6)],
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-            ),
-          ),
-          child: Center(
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Icon(icon, size: 48, color: Colors.white),
-                const SizedBox(height: 12),
-                Text(
-                  title,
-                  style: Theme.of(
-                    context,
-                  ).textTheme.titleMedium?.copyWith(color: Colors.white),
+    return Card(
+      elevation: 4,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(16),
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 20),
+          child: Row(
+            children: [
+              Icon(icon, size: 40, color: iconColor),
+              const SizedBox(width: 24),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(title, style: Theme.of(context).textTheme.titleMedium),
+                    const SizedBox(height: 4),
+                    Text(
+                      subtitle,
+                      style: Theme.of(context).textTheme.bodySmall,
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ],
                 ),
-              ],
-            ),
+              ),
+              const Icon(
+                Icons.arrow_forward_ios,
+                color: Colors.grey,
+                size: 16,
+              ),
+            ],
           ),
         ),
       ),

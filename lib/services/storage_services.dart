@@ -11,7 +11,7 @@ class StorageServices {
       file: InputFile.fromPath(path: path),
     );
     final url =
-        "https://fra.cloud.appwrite.io/v1/storage/buckets/${dotenv.env["BUCKET_ID"]}/files/${file.$id}/view?project=${dotenv.env["PROJECT_ID"]}";
+        "https://fra.cloud.appwrite.io/v1/storage/buckets/${dotenv.env["BUCKET_ID"]}/files/${file.$id}/view?project=${dotenv.env["APPWRITE_APP_ID"]}";
 
     return url;
   }
