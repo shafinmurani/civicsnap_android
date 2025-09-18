@@ -2,7 +2,6 @@ import 'dart:io';
 
 import 'package:civicsnap_android/models/report.dart';
 import 'package:civicsnap_android/services/db_services.dart';
-import 'package:civicsnap_android/services/storage_services.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
@@ -10,6 +9,8 @@ import 'package:go_router/go_router.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:geocoding/geocoding.dart';
+import 'package:easy_localization/easy_localization.dart';
+import '../components/error_snackbar.dart';
 
 class CreateReportPage extends StatefulWidget {
   const CreateReportPage({super.key});
@@ -24,18 +25,22 @@ class _CreateReportPageState extends State<CreateReportPage> {
   double? _longitude;
   String? _city;
   final TextEditingController _descriptionController = TextEditingController();
-  String? _selectedCategory;
+
+  // Use a map to store the English key and the localized value
+  final Map<String, String> _categories = {
+    'road_damage': 'roadDamage'.tr(),
+    'garbage': 'garbage'.tr(),
+    'street_light': 'streetLight'.tr(),
+    'water_supply': 'waterSupply'.tr(),
+    'other': 'otherCategory'.tr(),
+  };
+
+  String? _selectedCategory; // This will now store the English key
+
   Position? location;
   bool _isLoading = false;
   bool _locationLoading = true;
-
-  final List<String> _categories = [
-    "Road Damage",
-    "Garbage",
-    "Street Light",
-    "Water Supply",
-    "Other",
-  ];
+  bool _isTakingPhoto = true;
 
   @override
   void initState() {
@@ -44,258 +49,258 @@ class _CreateReportPageState extends State<CreateReportPage> {
   }
 
   Future<void> _initPage() async {
-    await _openCamera();
-    await _getLocation();
+    await _determinePosition();
+    await _takePhoto();
   }
 
-  Future<void> _openCamera() async {
-    final picker = ImagePicker();
-    final pickedFile = await picker.pickImage(source: ImageSource.camera);
-
-    if (pickedFile != null) {
-      setState(() {
-        _image = pickedFile;
-      });
-    } else {
-      if (mounted) Navigator.pop(context);
-    }
-  }
-
-  Future<void> _getLocation() async {
+  Future<void> _determinePosition() async {
     try {
       bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
       if (!serviceEnabled) {
-        setState(() => _locationLoading = false);
+        if (mounted) setState(() => _locationLoading = false);
         return;
       }
 
       LocationPermission permission = await Geolocator.checkPermission();
       if (permission == LocationPermission.denied) {
         permission = await Geolocator.requestPermission();
-        if (permission == LocationPermission.deniedForever ||
-            permission == LocationPermission.denied) {
-          setState(() => _locationLoading = false);
+        if (permission == LocationPermission.denied) {
+          if (mounted) setState(() => _locationLoading = false);
           return;
         }
       }
 
-      final position = await Geolocator.getCurrentPosition(
+      if (permission == LocationPermission.deniedForever) {
+        if (mounted) setState(() => _locationLoading = false);
+        return;
+      }
+
+      location = await Geolocator.getCurrentPosition(
         locationSettings: const LocationSettings(
           accuracy: LocationAccuracy.best,
         ),
       );
-
       List<Placemark> placemarks = await placemarkFromCoordinates(
-        position.latitude,
-        position.longitude,
+        location!.latitude,
+        location!.longitude,
       );
-
-      setState(() {
-        _latitude = position.latitude;
-        _longitude = position.longitude;
-        location = position;
-        _city = placemarks.isNotEmpty
-            ? placemarks.first.locality ?? "Unknown"
-            : "Unknown";
-        _locationLoading = false;
-      });
-    } catch (_) {
-      setState(() => _locationLoading = false);
+      if (mounted) {
+        setState(() {
+          _city = placemarks.first.locality;
+          _latitude = location!.latitude;
+          _longitude = location!.longitude;
+        });
+      }
+    } catch (e) {
+      if (mounted) {
+        showErrorSnackbar(context, 'locationNotAvailable'.tr());
+      }
+    } finally {
+      if (mounted) {
+        setState(() => _locationLoading = false);
+      }
     }
   }
 
-  Future<void> _uploadReport() async {
-    if (_image == null ||
-        _descriptionController.text.isEmpty ||
-        _selectedCategory == null ||
-        location == null) {
+  Future<void> _takePhoto() async {
+    final ImagePicker picker = ImagePicker();
+    final XFile? image = await picker.pickImage(source: ImageSource.camera);
+
+    if (!mounted) return;
+
+    if (image != null) {
+      setState(() {
+        _image = image;
+        _isTakingPhoto = false;
+      });
+    } else {
+      setState(() {
+        _isTakingPhoto = false;
+      });
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text("Please fill all the required inputs.")),
-        );
+        context.pop();
       }
+    }
+  }
+
+  void _submitReport() async {
+    if (_image == null) {
+      if (mounted) showErrorSnackbar(context, 'imageNotSelected'.tr());
+      return;
+    }
+    if (_selectedCategory == null) {
+      if (mounted) showErrorSnackbar(context, 'categoryNotSelected'.tr());
       return;
     }
 
-    setState(() => _isLoading = true);
+    if (mounted) setState(() => _isLoading = true);
 
     try {
-      final String imageUrl = await StorageServices().uploadImage(
-        path: _image!.path,
-      );
-
-      final Report report = Report(
-        imageUrl: imageUrl,
-        latitude: location!.latitude,
-        longitude: location!.longitude,
-        description: _descriptionController.text,
-        category: _selectedCategory!,
+      final report = Report(
+        id: '',
         uid: FirebaseAuth.instance.currentUser!.uid,
+        imageUrl: "",
+        // The _selectedCategory now holds the English key, e.g., 'road_damage'
+        category: _selectedCategory!,
+        description: _descriptionController.text,
+        latitude: _latitude!,
+        longitude: _longitude!,
+        status: 'Submitted',
         uploadTime: DateTime.now(),
-        status: "Under Review",
         remarks: "N/A",
       );
-      try {
-        await DbServices.uploadReport(report);
-      } on Exception catch (e, _) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text(
-              "You have already submitted a report for this issue in the last 24 hours.",
-            ),
-          ),
-        );
-      }
 
+      await DbServices.uploadReport(report, _image!.path);
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text("Report submitted successfully!")),
-        );
-        context.go("/");
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text("reportSuccess".tr())));
+        context.go('/');
+      }
+    } catch (e) {
+      print(e);
+      if (mounted) {
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text("reportFailed".tr())));
+      }
+    } finally {
+      if (mounted) {
+        setState(() => _isLoading = false);
       }
     }
-
-    setState(() => _isLoading = false);
   }
 
   @override
   Widget build(BuildContext context) {
-    if (_image == null || _locationLoading) {
-      return const Scaffold(body: Center(child: CircularProgressIndicator()));
+    if (_isTakingPhoto) {
+      return Scaffold(
+        appBar: AppBar(title: Text('reportTitle'.tr()), centerTitle: true),
+        body: Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              const CircularProgressIndicator(),
+              const Gap(16),
+              Text('openingCamera'.tr()),
+            ],
+          ),
+        ),
+      );
+    }
+
+    if (_image == null) {
+      return Scaffold(
+        appBar: AppBar(title: Text('reportTitle'.tr()), centerTitle: true),
+        body: Center(child: Text('noImageSelected'.tr())),
+      );
     }
 
     return Scaffold(
-      appBar: AppBar(title: const Text("Report Issue"), centerTitle: true),
+      appBar: AppBar(title: Text('reportTitle'.tr()), centerTitle: true),
       body: SingleChildScrollView(
-        padding: const EdgeInsets.all(16),
+        padding: const EdgeInsets.all(24),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            // Image Section
-            Card(
-              child: Padding(
-                padding: const EdgeInsets.all(16.0),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      "Photo",
-                      style: Theme.of(context).textTheme.titleMedium,
-                    ),
-                    const Gap(8),
-                    ClipRRect(
-                      borderRadius: BorderRadius.circular(12),
-                      child: Image.file(
-                        File(_image!.path),
-                        height: 200,
-                        width: double.infinity,
-                        fit: BoxFit.cover,
-                      ),
-                    ),
-                  ],
-                ),
+            Container(
+              height: 200,
+              decoration: BoxDecoration(
+                color: Colors.grey[200],
+                borderRadius: BorderRadius.circular(12),
+                border: Border.all(color: Colors.grey[400]!),
               ),
-            ),
-            const Gap(16),
-
-            // Location Section
-            Card(
-              child: Padding(
-                padding: const EdgeInsets.all(16.0),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      "Location Details",
-                      style: Theme.of(context).textTheme.titleMedium,
-                    ),
-                    const Gap(8),
-                    _buildInfoRow(
-                      context,
-                      Icons.location_on_outlined,
-                      "City",
-                      _city ?? "Unknown",
-                    ),
-                    const Gap(10),
-                    _buildInfoRow(
-                      context,
-                      Icons.gps_fixed_outlined,
-                      "Coordinates",
-                      _latitude != null
-                          ? "(${_latitude!.toStringAsFixed(6)}, ${_longitude!.toStringAsFixed(6)})"
-                          : "Unavailable",
-                    ),
-                  ],
-                ),
-              ),
-            ),
-            const Gap(16),
-
-            // Report Details Section
-            Card(
-              child: Padding(
-                padding: const EdgeInsets.all(16.0),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      "Report Details",
-                      style: Theme.of(context).textTheme.titleMedium,
-                    ),
-                    const Gap(16),
-                    DropdownButtonFormField<String>(
-                      decoration: const InputDecoration(
-                        labelText: "Category",
-                        prefixIcon: Icon(Icons.category_outlined),
-                      ),
-                      items: _categories
-                          .map(
-                            (cat) =>
-                                DropdownMenuItem(value: cat, child: Text(cat)),
-                          )
-                          .toList(),
-                      onChanged: (value) {
-                        setState(() {
-                          _selectedCategory = value;
-                        });
-                      },
-                    ),
-                    const Gap(16),
-                    TextField(
-                      controller: _descriptionController,
-                      maxLines: 4,
-                      decoration: const InputDecoration(
-                        labelText: "Description",
-                        alignLabelWithHint: true,
-                        prefixIcon: Icon(Icons.description_outlined),
-                      ),
-                    ),
-                  ],
-                ),
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(12),
+                child: Image.file(File(_image!.path), fit: BoxFit.cover),
               ),
             ),
             const Gap(24),
-
-            // Buttons Section
             ElevatedButton.icon(
-              onPressed: _isLoading ? null : _uploadReport,
-              icon: _isLoading
-                  ? const SizedBox(
-                      height: 20,
-                      width: 20,
-                      child: CircularProgressIndicator(strokeWidth: 2),
-                    )
-                  : const Icon(Icons.upload_file_outlined),
-              label: const Text("Submit Report"),
+              onPressed: _takePhoto,
+              icon: const Icon(Icons.camera),
+              label: Text('retakePhoto'.tr()),
+            ),
+            const Gap(24),
+            _buildInfoRow(
+              context,
+              Icons.location_on,
+              'selectLocation'.tr(),
+              _locationLoading
+                  ? 'locationLoading'.tr()
+                  : _city ?? 'locationNotAvailable'.tr(),
+            ),
+            const Gap(16),
+            Text(
+              'reportCategory'.tr(),
+              style: Theme.of(context).textTheme.bodySmall,
+            ),
+            const Gap(8),
+            DropdownButtonFormField<String>(
+              decoration: InputDecoration(
+                hintText: 'categoryPlaceholder'.tr(),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                contentPadding: const EdgeInsets.symmetric(
+                  vertical: 16,
+                  horizontal: 16,
+                ),
+              ),
+              initialValue: _selectedCategory,
+              onChanged: (String? newValue) {
+                if (mounted) {
+                  setState(() {
+                    _selectedCategory = newValue;
+                  });
+                }
+              },
+              items: _categories.entries.map<DropdownMenuItem<String>>((
+                MapEntry<String, String> entry,
+              ) {
+                return DropdownMenuItem<String>(
+                  value: entry.key, // The unique English key
+                  child: Text(entry.value), // The localized string for display
+                );
+              }).toList(),
+            ),
+            const Gap(16),
+            Text(
+              'addDescription'.tr(),
+              style: Theme.of(context).textTheme.bodySmall,
+            ),
+            const Gap(8),
+            TextField(
+              controller: _descriptionController,
+              decoration: InputDecoration(
+                hintText: 'descriptionPlaceholder'.tr(),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                contentPadding: const EdgeInsets.symmetric(
+                  vertical: 16,
+                  horizontal: 16,
+                ),
+              ),
+              maxLines: 4,
+            ),
+            const Gap(32),
+            ElevatedButton(
+              onPressed: (_isLoading || _locationLoading)
+                  ? null
+                  : _submitReport,
               style: ElevatedButton.styleFrom(
                 minimumSize: const Size(double.infinity, 50),
               ),
+              child: _isLoading
+                  ? const CircularProgressIndicator(color: Colors.white)
+                  : Text('submitReport'.tr()),
             ),
             const Gap(16),
             OutlinedButton.icon(
               onPressed: _isLoading ? null : () => context.go("/"),
               icon: const Icon(Icons.cancel_outlined),
-              label: const Text("Cancel"),
+              label: Text('cancel'.tr()),
               style: OutlinedButton.styleFrom(
                 foregroundColor: Theme.of(context).colorScheme.onSurface,
                 side: BorderSide(
@@ -329,7 +334,7 @@ class _CreateReportPageState extends State<CreateReportPage> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(label, style: Theme.of(context).textTheme.bodySmall),
-              Text(value, style: Theme.of(context).textTheme.bodyLarge),
+              Text(value, style: Theme.of(context).textTheme.bodyMedium),
             ],
           ),
         ),

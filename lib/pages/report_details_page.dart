@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import '../models/report.dart';
-import 'package:intl/intl.dart';
+import 'package:easy_localization/easy_localization.dart';
 
 class ReportDetailsPage extends StatelessWidget {
   final String reportId;
@@ -22,7 +22,7 @@ class ReportDetailsPage extends StatelessWidget {
     final theme = Theme.of(context);
 
     return Scaffold(
-      appBar: AppBar(title: const Text("Report Details"), centerTitle: true),
+      appBar: AppBar(title: Text('reportDetailsTitle'.tr()), centerTitle: true),
       body: FutureBuilder<Report?>(
         future: _fetchReport(),
         builder: (context, snapshot) {
@@ -30,84 +30,37 @@ class ReportDetailsPage extends StatelessWidget {
             return const Center(child: CircularProgressIndicator());
           }
           if (!snapshot.hasData || snapshot.data == null) {
-            return const Center(
+            return Center(
               child: Text(
-                "Report not found.",
-                style: TextStyle(fontSize: 16, color: Colors.black54),
+                'reportNotFound'.tr(),
+                style: const TextStyle(fontSize: 16, color: Colors.black54),
               ),
             );
           }
 
           final report = snapshot.data!;
-          final formattedDate = DateFormat(
-            'yyyy-MM-dd HH:mm',
-          ).format(report.uploadTime);
+          final formattedDate = DateFormat.yMMMd(context.locale.toString()).format(report.uploadTime);
+
           return SingleChildScrollView(
             padding: const EdgeInsets.all(16),
             child: Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                _buildReportImage(report.imageUrl),
-                const SizedBox(height: 16),
-                Card(
-                  child: Padding(
-                    padding: const EdgeInsets.all(16),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          report.category,
-                          style: theme.textTheme.headlineSmall,
-                        ),
-                        const SizedBox(height: 8),
-                        _buildInfoRow(
-                          context,
-                          Icons.info_outline,
-                          "Status",
-                          report.status,
-                        ),
-                        const SizedBox(height: 8),
-                        _buildInfoRow(
-                          context,
-                          Icons.comment_outlined,
-                          "Remarks",
-                          report.remarks.isEmpty ? "N/A" : report.remarks,
-                        ),
-                        const SizedBox(height: 8),
-                        _buildInfoRow(
-                          context,
-                          Icons.description_outlined,
-                          "Description",
-                          report.description,
-                        ),
-                      ],
-                    ),
+                _buildReportImage(report.imageUrl, context),
+                const SizedBox(height: 20),
+                Text(
+                  report.category,
+                  style: theme.textTheme.headlineMedium!.copyWith(
+                    fontWeight: FontWeight.bold,
+                    color: theme.colorScheme.primary,
                   ),
                 ),
-                const SizedBox(height: 16),
-                Card(
-                  child: Padding(
-                    padding: const EdgeInsets.all(16),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        _buildInfoRow(
-                          context,
-                          Icons.location_on_outlined,
-                          "Location",
-                          "(${report.latitude.toStringAsFixed(6)}, ${report.longitude.toStringAsFixed(6)})",
-                        ),
-                        const SizedBox(height: 8),
-                        _buildInfoRow(
-                          context,
-                          Icons.access_time,
-                          "Uploaded",
-                          formattedDate,
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
+                const SizedBox(height: 12),
+                // _buildInfoRow(context, Icons.location_city, 'city'.tr(), report.city),
+                _buildInfoRow(context, Icons.category, 'category'.tr(), report.category),
+                _buildInfoRow(context, Icons.info_outline, 'status'.tr(), report.status),
+                _buildInfoRow(context, Icons.calendar_today, 'date'.tr(), formattedDate),
+                _buildInfoRow(context, Icons.description, 'description'.tr(), report.description),
               ],
             ),
           );
@@ -116,9 +69,9 @@ class ReportDetailsPage extends StatelessWidget {
     );
   }
 
-  Widget _buildReportImage(String imageUrl) {
+  Widget _buildReportImage(String imageUrl, BuildContext context) {
     return ClipRRect(
-      borderRadius: BorderRadius.circular(16),
+      borderRadius: BorderRadius.circular(12),
       child: Image.network(
         imageUrl,
         height: 250,
@@ -138,15 +91,15 @@ class ReportDetailsPage extends StatelessWidget {
             ),
           );
         },
-        errorBuilder: (context, error, stackTrace) => const SizedBox(
+        errorBuilder: (context, error, stackTrace) => SizedBox(
           height: 250,
           child: Center(
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Icon(Icons.error, color: Colors.red, size: 40),
-                SizedBox(height: 8),
-                Text("Failed to load image"),
+                const Icon(Icons.error, color: Colors.red, size: 40),
+                const SizedBox(height: 8),
+                Text("Failed to load image".tr()),
               ],
             ),
           ),
@@ -162,22 +115,25 @@ class ReportDetailsPage extends StatelessWidget {
     String value,
   ) {
     final theme = Theme.of(context);
-    return Row(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Icon(icon, color: theme.colorScheme.primary, size: 20),
-        const SizedBox(width: 12),
-        Expanded(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text("$label:", style: theme.textTheme.bodySmall),
-              const SizedBox(height: 4),
-              Text(value, style: theme.textTheme.bodyMedium),
-            ],
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 8),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Icon(icon, color: theme.colorScheme.primary, size: 20),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text("$label:", style: theme.textTheme.bodySmall),
+                const SizedBox(height: 4),
+                Text(value, style: theme.textTheme.bodyMedium),
+              ],
+            ),
           ),
-        ),
-      ],
+        ],
+      ),
     );
   }
 }

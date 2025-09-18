@@ -3,6 +3,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:civicsnap_android/services/login_services.dart';
 import 'package:go_router/go_router.dart';
+import 'package:easy_localization/easy_localization.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -33,40 +34,30 @@ class _HomePageState extends State<HomePage> {
       setState(() {
         isLoading = false;
       });
-      showErrorSnackbar(
-        context,
-        "There was an error while fetching your user, please try again.",
-      );
+      showErrorSnackbar(context, 'errorFetchingUser'.tr());
     }
   }
 
-  // New method to show the confirmation dialog
   Future<void> _showLogoutConfirmationDialog() async {
     return showDialog<void>(
       context: context,
-      barrierDismissible: false, // User must tap a button to close the dialog
-      builder: (BuildContext dialogContext) {
+      barrierDismissible: false,
+      builder: (BuildContext context) {
         return AlertDialog(
-          title: const Text('Confirm Logout'),
-          content: const SingleChildScrollView(
-            child: ListBody(
-              children: <Widget>[
-                Text('Are you sure you want to log out?'),
-              ],
-            ),
-          ),
+          title: Text('confirmLogout'.tr()),
+          content: Text('Are you sure you want to log out?'.tr()),
           actions: <Widget>[
             TextButton(
-              child: const Text('Cancel'),
+              child: Text('cancel'.tr()),
               onPressed: () {
-                Navigator.of(dialogContext).pop(); // Dismiss the dialog
+                Navigator.of(context).pop();
               },
             ),
             TextButton(
-              child: const Text('Logout'),
-              onPressed: () {
-                _loginServices.logout(context);
-                Navigator.of(dialogContext).pop(); // Dismiss the dialog
+              child: Text('logoutButton'.tr()),
+              onPressed: () async {
+                Navigator.of(context).pop();
+                await _loginServices.logout(context);
               },
             ),
           ],
@@ -77,72 +68,60 @@ class _HomePageState extends State<HomePage> {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-
+    if (isLoading) {
+      return const Scaffold(body: Center(child: CircularProgressIndicator()));
+    }
     return Scaffold(
       appBar: AppBar(
-        title: const Text("CivicSnap"),
+        title: Text('homeTitle'.tr()),
+        centerTitle: true,
         actions: [
           IconButton(
-            icon: const Icon(Icons.logout),
-            tooltip: "Logout",
-            onPressed: _showLogoutConfirmationDialog, // Call the new method
+            icon: const Icon(Icons.exit_to_app),
+            onPressed: _showLogoutConfirmationDialog,
+            tooltip: 'logoutButton'.tr(),
           ),
         ],
       ),
-      body: isLoading
-          ? const Center(child: CircularProgressIndicator())
-          : SingleChildScrollView(
-              padding: const EdgeInsets.all(24.0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    "Welcome back, ${user?.displayName?.split(' ')[0] ?? 'Guest'}!",
-                    style: theme.textTheme.titleLarge,
-                  ),
-                  const SizedBox(height: 4),
-                  Text(
-                    "What would you like to do today?",
-                    style: theme.textTheme.bodyMedium?.copyWith(
-                      color: theme.colorScheme.onSurface.withOpacity(0.7),
-                    ),
-                  ),
-                  const SizedBox(height: 32),
-                  // Report Issue Card
-                  _buildFeatureCard(
-                    context,
-                    title: "Report an Issue",
-                    subtitle: "Snap a photo of a problem in your community.",
-                    icon: Icons.add_a_photo_outlined,
-                    onTap: () => context.go("/report"),
-                    iconColor: theme.colorScheme.primary,
-                  ),
-                  const SizedBox(height: 16),
-                  // My Reports Card
-                  _buildFeatureCard(
-                    context,
-                    title: "My Reports",
-                    subtitle: "View the status of your reported issues.",
-                    icon: Icons.history_outlined,
-                    onTap: () => context.go("/my-reports"),
-                    iconColor: theme.colorScheme.secondary,
-                  ),
-                  const SizedBox(height: 16),
-                  // Settings Card
-                  _buildFeatureCard(
-                    context,
-                    title: "Settings",
-                    subtitle: "Manage your account and app preferences.",
-                    icon: Icons.settings_outlined,
-                    onTap: () {
-                      // TODO: Navigate to settings
-                    },
-                    iconColor: theme.colorScheme.onSurface,
-                  ),
-                ],
-              ),
+      body: SingleChildScrollView(
+        padding: const EdgeInsets.all(24),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              'welcomeMessage'.tr(namedArgs: {"name": user?.displayName ?? ''}),
+              style: Theme.of(context).textTheme.headlineMedium,
             ),
+            const SizedBox(height: 4),
+            Text('whatToDo'.tr(), style: Theme.of(context).textTheme.bodyLarge),
+            const SizedBox(height: 24),
+            _buildFeatureCard(
+              context,
+              title: 'reportTitle'.tr(),
+              subtitle: 'reportSubtitle'.tr(),
+              icon: Icons.add_circle_outline,
+              onTap: () => context.go('/report'),
+              iconColor: Theme.of(context).colorScheme.primary,
+            ),
+            _buildFeatureCard(
+              context,
+              title: 'myReportsTitle'.tr(),
+              subtitle: 'myReportsSubtitle'.tr(),
+              icon: Icons.list_alt,
+              onTap: () => context.go('/my-reports'),
+              iconColor: Theme.of(context).colorScheme.secondary,
+            ),
+            _buildFeatureCard(
+              context,
+              title: 'settingsTitle'.tr(),
+              subtitle: 'settingsSubtitle'.tr(),
+              icon: Icons.settings,
+              onTap: () => context.go('/settings'),
+              iconColor: Theme.of(context).colorScheme.tertiary,
+            ),
+          ],
+        ),
+      ),
     );
   }
 
@@ -181,11 +160,7 @@ class _HomePageState extends State<HomePage> {
                   ],
                 ),
               ),
-              const Icon(
-                Icons.arrow_forward_ios,
-                color: Colors.grey,
-                size: 16,
-              ),
+              const Icon(Icons.arrow_forward_ios, color: Colors.grey, size: 16),
             ],
           ),
         ),

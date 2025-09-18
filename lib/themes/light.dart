@@ -19,8 +19,7 @@ final ThemeData civicSnapLightTheme = ThemeData(
         secondary: const Color(0xFFFFB300), // A warm, golden yellow
         onSecondary: Colors.white,
         surface: Colors.white,
-        onSurface: const Color(0xFF263238), // A dark gray for text
-        background: const Color(0xFFF0F4F8),
+        onSurface: const Color(0xFF263238),
         error: const Color(0xFFD32F2F),
         onError: Colors.white,
       ),

@@ -2,6 +2,7 @@ import 'package:civicsnap_android/services/login_services.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:easy_localization/easy_localization.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -44,35 +45,31 @@ class _LoginPageState extends State<LoginPage> {
                         color: Color(0xFF4CAF50),
                       ),
                     ),
-                    const SizedBox(height: 24),
+                    const SizedBox(height: 16),
                     Text(
-                      "CivicSnap",
+                      'loginTitle'.tr(),
                       style: GoogleFonts.poppins(
-                        fontSize: 48,
+                        fontSize: 40,
                         fontWeight: FontWeight.bold,
                         color: Colors.white,
-                        shadows: [
-                          Shadow(
-                            offset: const Offset(2, 2),
-                            blurRadius: 4,
-                            color: Colors.black.withOpacity(0.2),
-                          ),
-                        ],
                       ),
                     ),
                     const SizedBox(height: 8),
-                    Text(
-                      "Snap. Report. Resolve.",
-                      style: GoogleFonts.poppins(
-                        fontSize: 18,
-                        color: Colors.white.withOpacity(0.8),
-                        fontWeight: FontWeight.w500,
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 20),
+                      child: Text(
+                        'loginSubtitle'.tr(),
+                        textAlign: TextAlign.center,
+                        style: GoogleFonts.poppins(
+                          fontSize: 16,
+                          color: Colors.white70,
+                        ),
                       ),
                     ),
                   ],
                 ),
                 const Spacer(flex: 2),
-                // Google Login Button
+                // Sign-in Button
                 ElevatedButton.icon(
                   onPressed: () {
                     LoginServices().signInWithGoogle(context);
@@ -82,7 +79,7 @@ class _LoginPageState extends State<LoginPage> {
                     color: Colors.black87,
                   ),
                   label: Text(
-                    "Sign in with Google",
+                    'loginButton'.tr(),
                     style: GoogleFonts.poppins(
                       fontSize: 18,
                       fontWeight: FontWeight.w600,
@@ -103,7 +100,7 @@ class _LoginPageState extends State<LoginPage> {
                 const Spacer(),
                 // Footer
                 Text(
-                  "© 2025 CivicSnap",
+                  'footerText'.tr(),
                   style: GoogleFonts.poppins(
                     fontSize: 12,
                     color: Colors.white70,

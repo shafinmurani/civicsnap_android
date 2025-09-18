@@ -1,6 +1,7 @@
 // lib/services/db_services.dart
 
 import 'package:civicsnap_android/models/report.dart';
+import 'package:civicsnap_android/services/storage_services.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:geolocator/geolocator.dart';
@@ -23,7 +24,11 @@ class DbServices {
     }
   }
 
-  static Future<bool> isDuplicateReport(Position position, String uid) async {
+  static Future<bool> isDuplicateReport(
+    Position position,
+    String uid,
+    Report report,
+  ) async {
     final now = DateTime.now();
     final cutoff = now.subtract(duplicateDuration);
 
@@ -45,14 +50,17 @@ class DbServices {
         reportLon,
       );
 
-      if (distance <= duplicateRadius) {
+      if (distance <= duplicateRadius && data['category'] == report.category) {
         return true; // Found a duplicate
       }
     }
     return false;
   }
 
-  static Future uploadReport(final Report report) async {
+  static Future uploadReport(
+    final Report report,
+    final String imagePath,
+  ) async {
     final duplicate = await isDuplicateReport(
       Position(
         latitude: report.latitude,
@@ -67,6 +75,7 @@ class DbServices {
         headingAccuracy: 0,
       ),
       report.uid,
+      report,
     );
     if (duplicate) {
       throw Exception(
@@ -74,10 +83,12 @@ class DbServices {
       );
     }
 
+    final String imageUrl = await StorageServices().uploadImage(path: imagePath);
+
     final docRef = FirebaseFirestore.instance.collection("reports").doc();
     final reportWithId = Report(
       id: docRef.id,
-      imageUrl: report.imageUrl,
+      imageUrl: imageUrl,
       latitude: report.latitude,
       longitude: report.longitude,
       description: report.description,

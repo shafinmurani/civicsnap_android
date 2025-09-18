@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:intl/intl.dart';
 import '../models/report.dart';
 import '../services/db_services.dart';
+import 'package:easy_localization/easy_localization.dart';
 
 class MyReportsPage extends StatelessWidget {
   const MyReportsPage({super.key});
@@ -10,7 +10,7 @@ class MyReportsPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text("My Reports"), centerTitle: true),
+      appBar: AppBar(title: Text('myReportsTitle'.tr()), centerTitle: true),
       body: StreamBuilder<List<Report>>(
         stream: DbServices.getUserReportsStream(),
         builder: (context, snapshot) {
@@ -18,11 +18,11 @@ class MyReportsPage extends StatelessWidget {
             return const Center(child: CircularProgressIndicator());
           }
           if (!snapshot.hasData || snapshot.data!.isEmpty) {
-            return const Center(
+            return Center(
               child: Text(
-                "No reports found. Start by creating a new one!",
+                'noReportsFound'.tr(),
                 textAlign: TextAlign.center,
-                style: TextStyle(fontSize: 16, color: Colors.black54),
+                style: const TextStyle(fontSize: 16, color: Colors.black54),
               ),
             );
           }
@@ -44,17 +44,16 @@ class MyReportsPage extends StatelessWidget {
 
 class _ReportCard extends StatelessWidget {
   final Report report;
-
   const _ReportCard({required this.report});
 
   Color _getStatusColor(String status) {
-    switch (status) {
-      case 'Submitted':
-        return Colors.orange;
-      case 'In Progress':
+    switch (status.toLowerCase()) {
+      case 'submitted':
         return Colors.blue;
-      case 'Resolved':
-        return const Color(0xFF4CAF50);
+      case 'in progress':
+        return Colors.orange;
+      case 'resolved':
+        return Colors.green;
       default:
         return Colors.grey;
     }
@@ -63,48 +62,30 @@ class _ReportCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final formattedDate = DateFormat('MMM dd, yyyy').format(report.uploadTime);
+    final formattedDate = DateFormat.yMMMd(
+      context.locale.toString(),
+    ).format(report.uploadTime);
 
     return Card(
+      margin: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
       elevation: 3,
-      margin: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
       child: InkWell(
-        onTap: () => context.push("/report/${report.id}"),
-        borderRadius: BorderRadius.circular(16),
+        onTap: () => context.go('/report/${report.id}'),
+        borderRadius: BorderRadius.circular(12),
         child: Padding(
-          padding: const EdgeInsets.all(12),
+          padding: const EdgeInsets.all(16),
           child: Row(
             children: [
-              ClipRRect(
-                borderRadius: BorderRadius.circular(12),
-                child: Image.network(
-                  report.imageUrl,
-                  width: 80,
-                  height: 80,
-                  fit: BoxFit.cover,
-                  loadingBuilder: (context, child, loadingProgress) {
-                    if (loadingProgress == null) return child;
-                    return const SizedBox(
-                      width: 80,
-                      height: 80,
-                      child: Center(child: CircularProgressIndicator()),
-                    );
-                  },
-                  errorBuilder: (context, error, stackTrace) => const SizedBox(
-                    width: 80,
-                    height: 80,
-                    child: Icon(Icons.broken_image, color: Colors.grey),
-                  ),
-                ),
-              ),
+              // You can add a placeholder image here or use a report-specific icon
+              Icon(Icons.image, size: 50, color: theme.colorScheme.primary),
               const SizedBox(width: 16),
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      report.category,
+                      report.category.tr(),
                       style: theme.textTheme.titleMedium,
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
