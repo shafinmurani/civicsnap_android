@@ -28,11 +28,11 @@ class _CreateReportPageState extends State<CreateReportPage> {
 
   // Use a map to store the English key and the localized value
   final Map<String, String> _categories = {
-    'road_damage': 'roadDamage'.tr(),
+    'roadDamage': 'roadDamage'.tr(),
     'garbage': 'garbage'.tr(),
-    'street_light': 'streetLight'.tr(),
-    'water_supply': 'waterSupply'.tr(),
-    'other': 'otherCategory'.tr(),
+    'streetLight': 'streetLight'.tr(),
+    'waterSupply': 'waterSupply'.tr(),
+    'otherCategory': 'otherCategory'.tr(),
   };
 
   String? _selectedCategory; // This will now store the English key
