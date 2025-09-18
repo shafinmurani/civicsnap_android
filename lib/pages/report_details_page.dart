@@ -39,7 +39,9 @@ class ReportDetailsPage extends StatelessWidget {
           }
 
           final report = snapshot.data!;
-          final formattedDate = DateFormat.yMMMd(context.locale.toString()).format(report.uploadTime);
+          final formattedDate = DateFormat.yMMMd(
+            context.locale.toString(),
+          ).format(report.uploadTime);
 
           return SingleChildScrollView(
             padding: const EdgeInsets.all(16),
@@ -49,7 +51,7 @@ class ReportDetailsPage extends StatelessWidget {
                 _buildReportImage(report.imageUrl, context),
                 const SizedBox(height: 20),
                 Text(
-                  report.category,
+                  report.category.tr(),
                   style: theme.textTheme.headlineMedium!.copyWith(
                     fontWeight: FontWeight.bold,
                     color: theme.colorScheme.primary,
@@ -57,10 +59,30 @@ class ReportDetailsPage extends StatelessWidget {
                 ),
                 const SizedBox(height: 12),
                 // _buildInfoRow(context, Icons.location_city, 'city'.tr(), report.city),
-                _buildInfoRow(context, Icons.category, 'category'.tr(), report.category),
-                _buildInfoRow(context, Icons.info_outline, 'status'.tr(), report.status),
-                _buildInfoRow(context, Icons.calendar_today, 'date'.tr(), formattedDate),
-                _buildInfoRow(context, Icons.description, 'description'.tr(), report.description),
+                _buildInfoRow(
+                  context,
+                  Icons.category,
+                  'category'.tr(),
+                  report.category.tr(),
+                ),
+                _buildInfoRow(
+                  context,
+                  Icons.info_outline,
+                  'status'.tr(),
+                  report.status,
+                ),
+                _buildInfoRow(
+                  context,
+                  Icons.calendar_today,
+                  'date'.tr(),
+                  formattedDate,
+                ),
+                _buildInfoRow(
+                  context,
+                  Icons.description,
+                  'description'.tr(),
+                  report.description,
+                ),
               ],
             ),
           );
