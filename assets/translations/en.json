@@ -48,5 +48,12 @@
   "changeLanguage": "Choose your preferred language:",
   "errorFetchingUser": "There was an error while fetching your user, please try again.",
   "retakePhoto": "Retake Photo",
-  "openingCamera": "Opening camera..."
+  "openingCamera": "Opening camera...",
+  "permissionDeniedTitle": "Permission Denied",
+  "permissionDeniedMessage": "Please grant location access in settings to get your current location.",
+  "openSettingsButton": "Open Settings",
+  "serviceDisabledTitle": "Location Service Disabled",
+  "serviceDisabledMessage": "Please enable location services on your device to continue.",
+  "locationServiceDisabledTitle": "Location Services Disabled",
+  "locationServiceDisabledMessage": "Please enable your device's location services"
 }

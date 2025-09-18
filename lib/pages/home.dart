@@ -1,9 +1,12 @@
+import 'dart:async';
 import 'package:civicsnap_android/components/error_snackbar.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:civicsnap_android/services/login_services.dart';
 import 'package:go_router/go_router.dart';
 import 'package:easy_localization/easy_localization.dart';
+import 'package:geolocator/geolocator.dart';
+import 'package:flutter/services.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -12,15 +15,44 @@ class HomePage extends StatefulWidget {
   State<HomePage> createState() => _HomePageState();
 }
 
-class _HomePageState extends State<HomePage> {
+class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
   User? user;
   bool isLoading = true;
   final LoginServices _loginServices = LoginServices();
+  late StreamSubscription<ServiceStatus> _locationStreamSubscription;
+  bool _isShowingDialog = false;
 
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addObserver(this);
     _getUser();
+    _checkLocationServicesAndPermissions();
+    _locationStreamSubscription = Geolocator.getServiceStatusStream().listen(
+      _onLocationServiceStatusChanged,
+    );
+  }
+
+  @override
+  void dispose() {
+    _locationStreamSubscription.cancel();
+    WidgetsBinding.instance.removeObserver(this);
+    super.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.resumed) {
+      _checkLocationServicesAndPermissions();
+    }
+  }
+
+  void _onLocationServiceStatusChanged(ServiceStatus status) {
+    if (status == ServiceStatus.disabled) {
+      if (mounted && !_isShowingDialog) {
+        _checkLocationServicesAndPermissions();
+      }
+    }
   }
 
   Future<void> _getUser() async {
@@ -36,6 +68,108 @@ class _HomePageState extends State<HomePage> {
       });
       showErrorSnackbar(context, 'errorFetchingUser'.tr());
     }
+  }
+
+  Future<void> _checkLocationServicesAndPermissions() async {
+    // Check if a dialog is showing and if location is now enabled.
+    // If so, dismiss the dialog.
+    if (_isShowingDialog) {
+      bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
+      LocationPermission permission = await Geolocator.checkPermission();
+      if (serviceEnabled &&
+          permission != LocationPermission.denied &&
+          permission != LocationPermission.deniedForever) {
+        if (mounted) {
+          Navigator.of(context).pop();
+          _isShowingDialog = false;
+          return;
+        }
+      }
+    }
+
+    bool serviceEnabled;
+    LocationPermission permission;
+
+    // Test if location services are enabled.
+    serviceEnabled = await Geolocator.isLocationServiceEnabled();
+    if (!serviceEnabled) {
+      if (mounted) {
+        _isShowingDialog = true;
+        await _showLocationDialog(
+          'locationServiceDisabledTitle'.tr(),
+          'locationServiceDisabledMessage'.tr(),
+          () async {
+            await Geolocator.openLocationSettings();
+          },
+        );
+        _isShowingDialog = false;
+      }
+      return;
+    }
+
+    // Check for location permissions
+    permission = await Geolocator.checkPermission();
+    if (permission == LocationPermission.denied) {
+      permission = await Geolocator.requestPermission();
+      if (permission == LocationPermission.denied) {
+        if (mounted) {
+          _isShowingDialog = true;
+          await _showLocationDialog(
+            'permissionDeniedTitle'.tr(),
+            'permissionDeniedMessage'.tr(),
+            () async {
+              await Geolocator.openAppSettings();
+            },
+          );
+          _isShowingDialog = false;
+        }
+        return;
+      }
+    }
+
+    if (permission == LocationPermission.deniedForever) {
+      if (mounted) {
+        _isShowingDialog = true;
+        await _showLocationDialog(
+          'permissionDeniedTitle'.tr(),
+          'permissionDeniedMessage'.tr(),
+          () async {
+            await Geolocator.openAppSettings();
+          },
+        );
+        _isShowingDialog = false;
+      }
+      return;
+    }
+  }
+
+  Future<void> _showLocationDialog(
+    String title,
+    String content,
+    VoidCallback onOpenSettings,
+  ) {
+    return showDialog<void>(
+      context: context,
+      barrierDismissible: false,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text(title),
+          content: Text(content),
+          actions: <Widget>[
+            TextButton(
+              child: Text('cancel'.tr()),
+              onPressed: () {
+                SystemNavigator.pop();
+              },
+            ),
+            TextButton(
+              onPressed: onOpenSettings,
+              child: Text('openSettingsButton'.tr()),
+            ),
+          ],
+        );
+      },
+    );
   }
 
   Future<void> _showLogoutConfirmationDialog() async {
