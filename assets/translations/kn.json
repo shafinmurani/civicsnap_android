@@ -45,6 +45,7 @@
   "userNameLabel": "ಹೆಸರು",
   "userEmailLabel": "ಇಮೇಲ್",
   "languageTitle": "ಭಾಷೆ",
+  "address": "ವಿಳಾಸ",
   "changeLanguage": "ನಿಮ್ಮ ಆದ್ಯತೆಯ ಭಾಷೆಯನ್ನು ಆರಿಸಿ:",
   "errorFetchingUser": "ನಿಮ್ಮ ಬಳಕೆದಾರರನ್ನು ತರುವಲ್ಲಿ ದೋಷವಿತ್ತು, ದಯವಿಟ್ಟು ಮತ್ತೆ ಪ್ರಯತ್ನಿಸಿ.",
   "retakePhoto": "ಫೋಟೋವನ್ನು ಮತ್ತೆ ತೆಗೆಯಿರಿ",
@@ -55,5 +56,6 @@
   "serviceDisabledTitle": "ಸ್ಥಳ ಸೇವೆ ನಿಷ್ಕ್ರಿಯಗೊಳಿಸಲಾಗಿದೆ",
   "serviceDisabledMessage": "ಮುಂದುವರೆಯಲು ದಯವಿಟ್ಟು ನಿಮ್ಮ ಸಾಧನದಲ್ಲಿ ಸ್ಥಳ ಸೇವೆಗಳನ್ನು ಸಕ್ರಿಯಗೊಳಿಸಿ.",
   "locationServiceDisabledTitle": "ಸ್ಥಳ ಸೇವೆಗಳು ನಿಷ್ಕ್ರಿಯಗೊಂಡಿವೆ",
-  "locationServiceDisabledMessage": "ವರದಿ ರಚಿಸಲು ದಯವಿಟ್ಟು ನಿಮ್ಮ ಸಾಧನದ ಸ್ಥಳ ಸೇವೆಗಳನ್ನು ಸಕ್ರಿಯಗೊಳಿಸಿ."
+  "locationServiceDisabledMessage": "ವರದಿ ರಚಿಸಲು ದಯವಿಟ್ಟು ನಿಮ್ಮ ಸಾಧನದ ಸ್ಥಳ ಸೇವೆಗಳನ್ನು ಸಕ್ರಿಯಗೊಳಿಸಿ.",
+  "remarks": "ಟಿಪ್ಪಣಿಗಳು"
 }

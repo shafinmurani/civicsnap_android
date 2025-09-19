@@ -52,6 +52,8 @@
   "permissionDeniedTitle": "परवानगी नाकारली",
   "permissionDeniedMessage": "तुमचे सध्याचे स्थान मिळवण्यासाठी कृपया सेटिंग्जमध्ये स्थान प्रवेश द्या.",
   "openSettingsButton": "सेटिंग्ज उघडा",
+  "remarks": "टिप्पण्या",
+  "address": "पत्ता",
   "serviceDisabledTitle": "स्थान सेवा अक्षम केली आहे",
   "serviceDisabledMessage": "सुरू ठेवण्यासाठी कृपया तुमच्या डिव्हाइसवर स्थान सेवा सक्षम करा.",
   "locationServiceDisabledTitle": "स्थान सेवा अक्षम",

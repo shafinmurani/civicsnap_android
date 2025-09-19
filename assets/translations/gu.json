@@ -45,6 +45,7 @@
   "userNameLabel": "નામ",
   "userEmailLabel": "ઇમેઇલ",
   "languageTitle": "ભાષા",
+  "remarks": "ટિપ્પણીઓ",
   "changeLanguage": "તમારી પસંદગીની ભાષા પસંદ કરો:",
   "errorFetchingUser": "તમારા વપરાશકર્તાને લાવતી વખતે એક ભૂલ હતી, કૃપા કરીને ફરીથી પ્રયાસ કરો.",
   "retakePhoto": "ફોટો ફરીથી લો",
@@ -55,6 +56,6 @@
   "serviceDisabledTitle": "સ્થાન સેવા અક્ષમ છે",
   "serviceDisabledMessage": "ચાલુ રાખવા માટે કૃપા કરીને તમારા ઉપકરણ પર સ્થાન સેવાઓ સક્ષમ કરો.",
   "locationServiceDisabledTitle": "લોકેશન સેવાઓ અક્ષમ",
-  "locationServiceDisabledMessage": "રિપોર્ટ બનાવવા માટે કૃપા કરીને તમારા ડિવાઇસની લોકેશન સેવાઓ સક્ષમ કરો."
- 
+  "locationServiceDisabledMessage": "રિપોર્ટ બનાવવા માટે કૃપા કરીને તમારા ડિવાઇસની લોકેશન સેવાઓ સક્ષમ કરો.",
+  "address": "સરનામું"
 }

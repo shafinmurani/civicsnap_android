@@ -83,17 +83,21 @@ class DbServices {
       );
     }
 
-    final String imageUrl = await StorageServices().uploadImage(path: imagePath);
+    final String imageUrl = await StorageServices().uploadImage(
+      path: imagePath,
+    );
 
     final docRef = FirebaseFirestore.instance.collection("reports").doc();
     final reportWithId = Report(
       id: docRef.id,
+      address: report.address,
       imageUrl: imageUrl,
       latitude: report.latitude,
       longitude: report.longitude,
       description: report.description,
       category: report.category,
       uid: report.uid,
+      city: report.city,
       uploadTime: DateTime.now(),
       status: report.status,
       remarks: report.remarks,

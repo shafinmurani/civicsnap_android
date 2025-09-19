@@ -25,6 +25,7 @@ class _CreateReportPageState extends State<CreateReportPage> {
   double? _longitude;
   String? _city;
   final TextEditingController _descriptionController = TextEditingController();
+  final TextEditingController _addressController = TextEditingController();
 
   // Use a map to store the English key and the localized value
   final Map<String, String> _categories = {
@@ -80,15 +81,26 @@ class _CreateReportPageState extends State<CreateReportPage> {
           accuracy: LocationAccuracy.best,
         ),
       );
+
       List<Placemark> placemarks = await placemarkFromCoordinates(
         location!.latitude,
         location!.longitude,
       );
+
       if (mounted) {
         setState(() {
           _city = placemarks.first.locality;
           _latitude = location!.latitude;
           _longitude = location!.longitude;
+
+          Placemark element;
+          for (element in placemarks) {
+            if (element == placemarks.last) {
+              _addressController.text += "${element.name}";
+            } else {
+              _addressController.text += "${element.name}, ";
+            }
+          }
         });
       }
     } catch (e) {
@@ -132,6 +144,9 @@ class _CreateReportPageState extends State<CreateReportPage> {
       if (mounted) showErrorSnackbar(context, 'categoryNotSelected'.tr());
       return;
     }
+    if (_city == null) {
+      if (mounted) showErrorSnackbar(context, 'locationNotAvailable'.tr());
+    }
 
     if (mounted) setState(() => _isLoading = true);
 
@@ -145,6 +160,8 @@ class _CreateReportPageState extends State<CreateReportPage> {
         description: _descriptionController.text,
         latitude: _latitude!,
         longitude: _longitude!,
+        city: _city!,
+        address: _addressController.text,
         status: 'Submitted',
         uploadTime: DateTime.now(),
         remarks: "N/A",
@@ -158,7 +175,6 @@ class _CreateReportPageState extends State<CreateReportPage> {
         context.go('/');
       }
     } catch (e) {
-      print(e);
       if (mounted) {
         ScaffoldMessenger.of(
           context,
@@ -224,11 +240,20 @@ class _CreateReportPageState extends State<CreateReportPage> {
             const Gap(24),
             _buildInfoRow(
               context,
-              Icons.location_on,
+              Icons.location_city_sharp,
               'selectLocation'.tr(),
               _locationLoading
                   ? 'locationLoading'.tr()
                   : _city ?? 'locationNotAvailable'.tr(),
+            ),
+            const Gap(16),
+            _buildInfoRow(
+              context,
+              Icons.location_on,
+              'address'.tr(),
+              _locationLoading
+                  ? 'locationLoading'.tr()
+                  : _addressController.text,
             ),
             const Gap(16),
             Text(
@@ -264,6 +289,7 @@ class _CreateReportPageState extends State<CreateReportPage> {
                 );
               }).toList(),
             ),
+
             const Gap(16),
             Text(
               'addDescription'.tr(),

@@ -58,7 +58,12 @@ class ReportDetailsPage extends StatelessWidget {
                   ),
                 ),
                 const SizedBox(height: 12),
-                // _buildInfoRow(context, Icons.location_city, 'city'.tr(), report.city),
+                _buildInfoRow(
+                  context,
+                  Icons.location_on,
+                  'city'.tr(),
+                  report.city,
+                ),
                 _buildInfoRow(
                   context,
                   Icons.category,
@@ -82,6 +87,12 @@ class ReportDetailsPage extends StatelessWidget {
                   Icons.description,
                   'description'.tr(),
                   report.description,
+                ),
+                _buildInfoRow(
+                  context,
+                  Icons.description,
+                  'remarks'.tr(),
+                  report.remarks,
                 ),
               ],
             ),

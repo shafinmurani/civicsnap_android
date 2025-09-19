@@ -26,6 +26,7 @@ class _SettingsPageState extends State<SettingsPage> {
     Locale('ta'),
     Locale('te'),
     Locale('pa'),
+    Locale('bn'),
   ];
 
   @override
@@ -45,10 +46,7 @@ class _SettingsPageState extends State<SettingsPage> {
       setState(() {
         isLoading = false;
       });
-      showErrorSnackbar(
-        context,
-        'errorFetchingUser'.tr(),
-      );
+      showErrorSnackbar(context, 'errorFetchingUser'.tr());
     }
   }
 
@@ -61,21 +59,23 @@ class _SettingsPageState extends State<SettingsPage> {
       case 'en':
         return 'English';
       case 'hi':
-        return 'Hindi';
+        return 'हिन्दी';
       case 'mr':
-        return 'Marathi';
+        return 'मराठी';
       case 'gu':
-        return 'Gujarati';
+        return 'ગુજરાતી';
       case 'kn':
-        return 'Kannada';
+        return 'ಕನ್ನಡ';
       case 'ml':
-        return 'Malayalam';
+        return 'മലയാളം';
       case 'ta':
-        return 'Tamil';
+        return 'தமிழ்';
       case 'te':
-        return 'Telugu';
+        return 'తెలుగు';
       case 'pa':
-        return 'Punjabi';
+        return 'ਪੰਜਾਬੀ';
+      case 'bn':
+        return "বাংলা";
       default:
         return locale.languageCode;
     }
@@ -84,10 +84,7 @@ class _SettingsPageState extends State<SettingsPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text('settingsTitle'.tr()),
-        centerTitle: true,
-      ),
+      appBar: AppBar(title: Text('settingsTitle'.tr()), centerTitle: true),
       body: isLoading
           ? const Center(child: CircularProgressIndicator())
           : SingleChildScrollView(
@@ -95,33 +92,43 @@ class _SettingsPageState extends State<SettingsPage> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text('profileTitle'.tr(),
-                      style: Theme.of(context).textTheme.titleLarge),
+                  Text(
+                    'profileTitle'.tr(),
+                    style: Theme.of(context).textTheme.titleLarge,
+                  ),
                   const SizedBox(height: 16),
                   _buildInfoRow(
-                      context,
-                      icon: Icons.person,
-                      label: 'userNameLabel'.tr(),
-                      value: user?.displayName ?? 'N/A'),
+                    context,
+                    icon: Icons.person,
+                    label: 'userNameLabel'.tr(),
+                    value: user?.displayName ?? 'N/A',
+                  ),
                   const SizedBox(height: 12),
                   _buildInfoRow(
-                      context,
-                      icon: Icons.email,
-                      label: 'userEmailLabel'.tr(),
-                      value: user?.email ?? 'N/A'),
+                    context,
+                    icon: Icons.email,
+                    label: 'userEmailLabel'.tr(),
+                    value: user?.email ?? 'N/A',
+                  ),
                   const SizedBox(height: 24),
-                  Text('languageTitle'.tr(),
-                      style: Theme.of(context).textTheme.titleLarge),
+                  Text(
+                    'languageTitle'.tr(),
+                    style: Theme.of(context).textTheme.titleLarge,
+                  ),
                   const SizedBox(height: 16),
-                  Text('changeLanguage'.tr(),
-                      style: Theme.of(context).textTheme.bodyMedium),
+                  Text(
+                    'changeLanguage'.tr(),
+                    style: Theme.of(context).textTheme.bodyMedium,
+                  ),
                   const SizedBox(height: 16),
                   DropdownButtonFormField<Locale>(
                     decoration: InputDecoration(
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(8),
                       ),
-                      contentPadding: const EdgeInsets.symmetric(horizontal: 16),
+                      contentPadding: const EdgeInsets.symmetric(
+                        horizontal: 16,
+                      ),
                     ),
                     initialValue: context.locale,
                     onChanged: (Locale? newLocale) {
@@ -129,8 +136,9 @@ class _SettingsPageState extends State<SettingsPage> {
                         _changeLanguage(newLocale);
                       }
                     },
-                    items: supportedLocales
-                        .map<DropdownMenuItem<Locale>>((Locale locale) {
+                    items: supportedLocales.map<DropdownMenuItem<Locale>>((
+                      Locale locale,
+                    ) {
                       return DropdownMenuItem<Locale>(
                         value: locale,
                         child: Text(_getLanguageName(locale)),
@@ -143,8 +151,12 @@ class _SettingsPageState extends State<SettingsPage> {
     );
   }
 
-  Widget _buildInfoRow(BuildContext context,
-      {required IconData icon, required String label, required String value}) {
+  Widget _buildInfoRow(
+    BuildContext context, {
+    required IconData icon,
+    required String label,
+    required String value,
+  }) {
     return Row(
       children: [
         Icon(icon, color: Theme.of(context).colorScheme.primary),

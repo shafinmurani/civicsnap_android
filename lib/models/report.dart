@@ -11,6 +11,8 @@ class Report {
   final String category;
   final String uid; // Use a single, consistent key
   final DateTime uploadTime;
+  final String city;
+  final String address;
   final String status;
   final String remarks;
 
@@ -24,6 +26,8 @@ class Report {
     required this.uid,
     required this.uploadTime,
     required this.status,
+    required this.city,
+    required this.address,
     required this.remarks,
   });
 
@@ -39,6 +43,8 @@ class Report {
       "uid": uid, // Use the correct, consistent key
       "uploadTime": uploadTime,
       "status": status,
+      "city": city,
+      "address": address,
       "remarks": remarks,
     };
   }
@@ -55,6 +61,8 @@ class Report {
       uid: json["uid"] as String,
       uploadTime: (json["uploadTime"] as Timestamp).toDate(),
       status: json["status"] as String,
+      city: json["city"] as String,
+      address: json["address"],
       remarks: json["remarks"] as String,
     );
   }
