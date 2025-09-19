@@ -7,7 +7,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:geolocator/geolocator.dart';
 
 class DbServices {
-  static const double duplicateRadius = 50; // meters
+  static const double duplicateRadius = 5; // meters
   static const Duration duplicateDuration = Duration(hours: 24);
 
   static Future checkAndCreateDocument(String? docID, name, email) async {

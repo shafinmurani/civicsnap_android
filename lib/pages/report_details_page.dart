@@ -62,7 +62,7 @@ class ReportDetailsPage extends StatelessWidget {
                   context,
                   Icons.location_on,
                   'city'.tr(),
-                  report.city,
+                  report.address,
                 ),
                 _buildInfoRow(
                   context,
