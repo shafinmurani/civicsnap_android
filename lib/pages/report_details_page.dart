@@ -102,38 +102,79 @@ class ReportDetailsPage extends StatelessWidget {
     );
   }
 
+  void _openImageModal(BuildContext context, String imageUrl) {
+    showDialog(
+      context: context,
+      builder: (context) => Dialog(
+        backgroundColor: Colors.transparent,
+        insetPadding: EdgeInsets.all(10),
+        child: InteractiveViewer(
+          panEnabled: true,
+          minScale: 0.5,
+          maxScale: 4,
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(12),
+            child: Image.network(
+              imageUrl,
+              fit: BoxFit.contain,
+              loadingBuilder: (context, child, loadingProgress) {
+                if (loadingProgress == null) return child;
+                return SizedBox(
+                  height: 200,
+                  child: Center(
+                    child: CircularProgressIndicator(
+                      value: loadingProgress.expectedTotalBytes != null
+                          ? loadingProgress.cumulativeBytesLoaded /
+                                loadingProgress.expectedTotalBytes!
+                          : null,
+                    ),
+                  ),
+                );
+              },
+              errorBuilder: (context, error, stackTrace) =>
+                  const Icon(Icons.broken_image, color: Colors.red, size: 80),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
   Widget _buildReportImage(String imageUrl, BuildContext context) {
-    return ClipRRect(
-      borderRadius: BorderRadius.circular(12),
-      child: Image.network(
-        imageUrl,
-        height: 250,
-        width: double.infinity,
-        fit: BoxFit.cover,
-        loadingBuilder: (context, child, loadingProgress) {
-          if (loadingProgress == null) return child;
-          return SizedBox(
+    return InkWell(
+      onTap: () => _openImageModal(context, imageUrl),
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(12),
+        child: Image.network(
+          imageUrl,
+          height: 250,
+          width: double.infinity,
+          fit: BoxFit.cover,
+          loadingBuilder: (context, child, loadingProgress) {
+            if (loadingProgress == null) return child;
+            return SizedBox(
+              height: 250,
+              child: Center(
+                child: CircularProgressIndicator(
+                  value: loadingProgress.expectedTotalBytes != null
+                      ? loadingProgress.cumulativeBytesLoaded /
+                            loadingProgress.expectedTotalBytes!
+                      : null,
+                ),
+              ),
+            );
+          },
+          errorBuilder: (context, error, stackTrace) => SizedBox(
             height: 250,
             child: Center(
-              child: CircularProgressIndicator(
-                value: loadingProgress.expectedTotalBytes != null
-                    ? loadingProgress.cumulativeBytesLoaded /
-                          loadingProgress.expectedTotalBytes!
-                    : null,
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  const Icon(Icons.error, color: Colors.red, size: 40),
+                  const SizedBox(height: 8),
+                  Text("Failed to load image".tr()),
+                ],
               ),
-            ),
-          );
-        },
-        errorBuilder: (context, error, stackTrace) => SizedBox(
-          height: 250,
-          child: Center(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                const Icon(Icons.error, color: Colors.red, size: 40),
-                const SizedBox(height: 8),
-                Text("Failed to load image".tr()),
-              ],
             ),
           ),
         ),

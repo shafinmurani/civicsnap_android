@@ -57,5 +57,6 @@
   "serviceDisabledMessage": "ચાલુ રાખવા માટે કૃપા કરીને તમારા ઉપકરણ પર સ્થાન સેવાઓ સક્ષમ કરો.",
   "locationServiceDisabledTitle": "લોકેશન સેવાઓ અક્ષમ",
   "locationServiceDisabledMessage": "રિપોર્ટ બનાવવા માટે કૃપા કરીને તમારા ડિવાઇસની લોકેશન સેવાઓ સક્ષમ કરો.",
-  "address": "સરનામું"
+  "address": "સરનામું",
+  "logoutConfirmation": "શું તમે ખાતરીપૂર્વક લોગ આઉટ કરવા માંગો છો?"
 }

@@ -57,5 +57,6 @@
   "serviceDisabledMessage": "ಮುಂದುವರೆಯಲು ದಯವಿಟ್ಟು ನಿಮ್ಮ ಸಾಧನದಲ್ಲಿ ಸ್ಥಳ ಸೇವೆಗಳನ್ನು ಸಕ್ರಿಯಗೊಳಿಸಿ.",
   "locationServiceDisabledTitle": "ಸ್ಥಳ ಸೇವೆಗಳು ನಿಷ್ಕ್ರಿಯಗೊಂಡಿವೆ",
   "locationServiceDisabledMessage": "ವರದಿ ರಚಿಸಲು ದಯವಿಟ್ಟು ನಿಮ್ಮ ಸಾಧನದ ಸ್ಥಳ ಸೇವೆಗಳನ್ನು ಸಕ್ರಿಯಗೊಳಿಸಿ.",
-  "remarks": "ಟಿಪ್ಪಣಿಗಳು"
+  "remarks": "ಟಿಪ್ಪಣಿಗಳು",
+  "logoutConfirmation": "ನೀವು ಲಾಗ್ ಔಟ್ ಮಾಡಲು ಖಚಿತವಾಗಿದ್ದೀರಾ?"
 }

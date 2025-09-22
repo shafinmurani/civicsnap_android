@@ -57,5 +57,6 @@
   "serviceDisabledTitle": "ਟਿਕਾਣਾ ਸੇਵਾ ਅਯੋਗ ਕੀਤੀ ਗਈ",
   "serviceDisabledMessage": "ਜਾਰੀ ਰੱਖਣ ਲਈ ਕਿਰਪਾ ਕਰਕੇ ਆਪਣੇ ਡਿਵਾਈਸ 'ਤੇ ਟਿਕਾਣਾ ਸੇਵਾਵਾਂ ਨੂੰ ਸਮਰੱਥ ਕਰੋ।",
   "locationServiceDisabledTitle": "ਟਿਕਾਣਾ ਸੇਵਾਵਾਂ ਅਸਮਰੱਥ",
-  "locationServiceDisabledMessage": "ਰਿਪੋਰਟ ਬਣਾਉਣ ਲਈ ਕਿਰਪਾ ਕਰਕੇ ਆਪਣੀ ਡਿਵਾਈਸ ਦੀਆਂ ਟਿਕਾਣਾ ਸੇਵਾਵਾਂ ਨੂੰ ਸਮਰੱਥ ਕਰੋ।"
+  "locationServiceDisabledMessage": "ਰਿਪੋਰਟ ਬਣਾਉਣ ਲਈ ਕਿਰਪਾ ਕਰਕੇ ਆਪਣੀ ਡਿਵਾਈਸ ਦੀਆਂ ਟਿਕਾਣਾ ਸੇਵਾਵਾਂ ਨੂੰ ਸਮਰੱਥ ਕਰੋ।",
+  "logoutConfirmation": "ਕੀ ਤੁਸੀਂ ਯਕੀਨੀ ਹੋ ਕਿ ਤੁਸੀਂ ਲਾਗ ਆਉਟ ਕਰਨਾ ਚਾਹੁੰਦੇ ਹੋ?"
 }

@@ -57,5 +57,6 @@
   "locationServiceDisabledTitle": "Location Services Disabled",
   "locationServiceDisabledMessage": "Please enable your device's location services",
   "remarks": "Remarks",
-  "address": "Address"
+  "address": "Address",
+  "logoutConfirmation": "Are you sure you want to log out?"
 }

@@ -57,5 +57,6 @@
   "serviceDisabledTitle": "स्थान सेवा अक्षम केली आहे",
   "serviceDisabledMessage": "सुरू ठेवण्यासाठी कृपया तुमच्या डिव्हाइसवर स्थान सेवा सक्षम करा.",
   "locationServiceDisabledTitle": "स्थान सेवा अक्षम",
-  "locationServiceDisabledMessage": "अहवाल तयार करण्यासाठी कृपया आपल्या डिव्हाइसची स्थान सेवा सक्षम करा."
+  "locationServiceDisabledMessage": "अहवाल तयार करण्यासाठी कृपया आपल्या डिव्हाइसची स्थान सेवा सक्षम करा.",
+  "logoutConfirmation": "तुम्ही लॉग आउट करू इच्छिता याची खात्री आहे का?"
 }

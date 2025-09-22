@@ -57,5 +57,6 @@
   "locationServiceDisabledTitle": "অবস্থান পরিষেবা বন্ধ",
   "locationServiceDisabledMessage": "আপনার ডিভাইসের অবস্থান পরিষেবা সক্ষম করুন।",
   "remarks": "মন্তব্য",
-  "address": "ঠিকানা"
+  "address": "ঠিকানা",
+  "logoutConfirmation":"আপনি কি নিশ্চিত যে আপনি লগ আউট করতে চান?"
 }

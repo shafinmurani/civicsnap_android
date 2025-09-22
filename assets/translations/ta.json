@@ -57,5 +57,6 @@
   "serviceDisabledTitle": "இருப்பிட சேவை முடக்கப்பட்டுள்ளது",
   "serviceDisabledMessage": "தொடர உங்கள் சாதனத்தில் இருப்பிட சேவைகளை இயக்கவும்.",
   "locationServiceDisabledTitle": "இருப்பிடச் சேவைகள் முடக்கப்பட்டுள்ளன",
-  "locationServiceDisabledMessage": "அறிக்கையை உருவாக்க உங்கள் சாதனத்தில் இருப்பிட சேவைகளை இயக்கவும்."
+  "locationServiceDisabledMessage": "அறிக்கையை உருவாக்க உங்கள் சாதனத்தில் இருப்பிட சேவைகளை இயக்கவும்.",
+  "logoutConfirmation": "நீங்கள் வெளியேற விரும்புகிறீர்கள் என்று உறுதியாக இருக்கிறீர்களா?"
 }

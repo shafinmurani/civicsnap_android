@@ -179,7 +179,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
       builder: (BuildContext context) {
         return AlertDialog(
           title: Text('confirmLogout'.tr()),
-          content: Text('Are you sure you want to log out?'.tr()),
+          content: Text('logoutConfirmation'.tr()),
           actions: <Widget>[
             TextButton(
               child: Text('cancel'.tr()),
