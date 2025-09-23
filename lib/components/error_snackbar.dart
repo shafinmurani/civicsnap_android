@@ -4,10 +4,9 @@ import 'package:flutter/material.dart';
 void showErrorSnackbar(BuildContext context, String err) {
   ScaffoldMessenger.of(context).showSnackBar(
     SnackBar(
-      content: Text(err.tr()),
+      content: Text(err),
       showCloseIcon: true,
       duration: Duration(seconds: 2),
     ),
   );
- 
 }

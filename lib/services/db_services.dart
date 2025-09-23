@@ -5,6 +5,7 @@ import 'package:civicsnap_android/services/storage_services.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:geolocator/geolocator.dart';
+import 'package:civicsnap_android/services/gemini_servies.dart';
 
 class DbServices {
   static const double duplicateRadius = 5; // meters
@@ -77,18 +78,33 @@ class DbServices {
       report.uid,
       report,
     );
+
     if (duplicate) {
-      throw Exception(
-        "You already reported an issue in this location within 24 hours.",
-      );
+      throw Exception("reportFailed");
+    }
+    final validReport = await GeminiService.validateReport(
+      imageUrl: report.imageUrl,
+      category: report.category,
+      description: report.description,
+    );
+    if (!validReport) {
+      throw Exception("validationErr");
     }
 
     final String imageUrl = await StorageServices().uploadImage(
       path: imagePath,
     );
 
+    final priority = await GeminiService.getPriority(
+      imageUrl: imageUrl,
+      description: report.description,
+      category: report.category,
+      city: report.city,
+    );
+
     final docRef = FirebaseFirestore.instance.collection("reports").doc();
     final reportWithId = Report(
+      priority: priority,
       id: docRef.id,
       address: report.address,
       imageUrl: imageUrl,

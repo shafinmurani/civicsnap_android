@@ -58,5 +58,7 @@
   "locationServiceDisabledMessage": "Please enable your device's location services",
   "remarks": "Remarks",
   "address": "Address",
-  "logoutConfirmation": "Are you sure you want to log out?"
+  "logoutConfirmation": "Are you sure you want to log out?",
+  "validationErr": "The uploaded image is not a valid image file. Please upload a JPEG or PNG image.",
+  "networkIssue": "Unable to connect to the server. Please check your internet connection."
 }

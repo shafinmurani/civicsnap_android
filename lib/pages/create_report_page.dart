@@ -147,6 +147,9 @@ class _CreateReportPageState extends State<CreateReportPage> {
     if (_city == null) {
       if (mounted) showErrorSnackbar(context, 'locationNotAvailable'.tr());
     }
+    if (_descriptionController.text.isEmpty) {
+      if (mounted) showErrorSnackbar(context, 'descriptionIsEmpty'.tr());
+    }
 
     if (mounted) setState(() => _isLoading = true);
 
@@ -165,20 +168,18 @@ class _CreateReportPageState extends State<CreateReportPage> {
         status: 'Submitted',
         uploadTime: DateTime.now(),
         remarks: "N/A",
+        priority: "",
       );
 
       await DbServices.uploadReport(report, _image!.path);
       if (mounted) {
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(SnackBar(content: Text("reportSuccess".tr())));
+        showErrorSnackbar(context, 'reportSuccess'.tr());
+
         context.go('/');
       }
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(SnackBar(content: Text("reportFailed".tr())));
+        showErrorSnackbar(context, e.toString().split(": ")[1].tr());
       }
     } finally {
       if (mounted) {

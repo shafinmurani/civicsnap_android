@@ -15,6 +15,7 @@ class Report {
   final String address;
   final String status;
   final String remarks;
+  final String priority;
 
   Report({
     this.id,
@@ -29,6 +30,7 @@ class Report {
     required this.city,
     required this.address,
     required this.remarks,
+    required this.priority,
   });
 
   Map<String, dynamic> toJson() {
@@ -46,6 +48,7 @@ class Report {
       "city": city,
       "address": address,
       "remarks": remarks,
+      "priority": priority,
     };
   }
 
@@ -64,6 +67,7 @@ class Report {
       city: json["city"] as String,
       address: json["address"],
       remarks: json["remarks"] as String,
+      priority: json["priority"] as String,
     );
   }
 }
