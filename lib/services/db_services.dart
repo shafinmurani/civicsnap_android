@@ -91,7 +91,7 @@ class DbServices {
       category: report.category,
       description: report.description,
     );
-    if (validReport) {
+    if (!validReport) {
       throw Exception("validationErr");
     }
 

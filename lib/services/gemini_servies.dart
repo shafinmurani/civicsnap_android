@@ -97,7 +97,7 @@ class GeminiService {
                   "You are validating a civic issue report. Don't be lenient and check the following:\n"
                   "1. Does the image mostly show the issue?\n"
                   "2. Does the image content roughly match the selected category?\n"
-                  "Return 'VALID' if it reasonably matches, else 'INVALID'. "
+                  "Return 'TRUE' if it reasonably matches, else 'FALSE'. "
                   "Do not be overly strict if the image is slightly unclear or partially obstructed.",
             },
             {"text": "Category: $category"},
@@ -120,7 +120,7 @@ class GeminiService {
       final data = jsonDecode(response.body);
       final text = data["candidates"][0]["content"]["parts"][0]["text"]
           .toUpperCase();
-      return text.contains("VALID");
+      return text.contains("TRUE");
     } else {
       throw Exception('validationErr');
     }
