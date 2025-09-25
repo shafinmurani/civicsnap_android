@@ -82,24 +82,25 @@ class DbServices {
     if (duplicate) {
       throw Exception("reportFailed");
     }
-    final validReport = await GeminiService.validateReport(
-      imageUrl: report.imageUrl,
-      category: report.category,
-      description: report.description,
-    );
-    if (!validReport) {
-      throw Exception("validationErr");
-    }
 
     final String imageUrl = await StorageServices().uploadImage(
       path: imagePath,
     );
+    final validReport = await GeminiService.validateReport(
+      imageUrl: imageUrl,
+      category: report.category,
+      description: report.description,
+    );
+    if (validReport) {
+      throw Exception("validationErr");
+    }
 
     final priority = await GeminiService.getPriority(
       imageUrl: imageUrl,
       description: report.description,
       category: report.category,
       city: report.city,
+      address: report.address,
     );
 
     final docRef = FirebaseFirestore.instance.collection("reports").doc();

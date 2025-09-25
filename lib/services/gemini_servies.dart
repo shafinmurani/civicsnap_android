@@ -5,47 +5,69 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 class GeminiService {
   /// Assigns priority to a report (High, Medium, Low)
   static Future<String> getPriority({
-    required String imageUrl,
+    required String imageUrl, // <-- remote Appwrite URL
     required String description,
     required String category,
     required String city,
+    required String address,
   }) async {
     final apiKey = dotenv.env["GEMINI_API_KEY"];
     final url =
         "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-pro:generateContent?key=$apiKey";
 
-    final body = {
-      "contents": [
-        {
-          "parts": [
-            {
-              "text":
-                  "You are an assistant that assigns priority levels to civic issue reports. "
-                  "Based on the image, description, category, and city, assign ONLY one of: High, Medium, Low.",
-            },
-            {"text": "Category: $category"},
-            {"text": "Description: $description"},
-            {"text": "City: $city"},
-            {
-              "file_data": {"file_uri": imageUrl},
-            },
-          ],
-        },
-      ],
-    };
+    try {
+      // Step 1: Download image from the given URL
+      final imageResponse = await http.get(Uri.parse(imageUrl));
+      if (imageResponse.statusCode != 200) {
+        throw Exception(
+          "Failed to fetch image from URL: ${imageResponse.statusCode}",
+        );
+      }
 
-    final response = await http.post(
-      Uri.parse(url),
-      headers: {"Content-Type": "application/json"},
-      body: jsonEncode(body),
-    );
+      // Step 2: Convert image bytes to base64
+      final base64Image = base64Encode(imageResponse.bodyBytes);
 
-    if (response.statusCode == 200) {
-      final data = jsonDecode(response.body);
-      final text = data["candidates"][0]["content"]["parts"][0]["text"];
-      return text.trim();
-    } else {
-      throw Exception("networkIssue");
+      // Step 3: Prepare Gemini request body
+      final body = {
+        "contents": [
+          {
+            "parts": [
+              {
+                "text":
+                    "You are an assistant that assigns priority levels to civic issue reports. "
+                    "Based on the image, description, category, location, and city, assign ONLY one of: High, Medium, Low. Be strict when setting priorities, if the image is indistinguishable or the description seems like it does not describe the issue, you may set it to Low.",
+              },
+              {"text": "Category: $category"},
+              {"text": "Address: $address"},
+              {"text": "Description: $description"},
+              {"text": "City: $city"},
+              {
+                "inline_data": {"mime_type": "image/jpeg", "data": base64Image},
+              },
+            ],
+          },
+        ],
+      };
+
+      // Step 4: Call Gemini API
+      final response = await http.post(
+        Uri.parse(url),
+        headers: {"Content-Type": "application/json"},
+        body: jsonEncode(body),
+      );
+
+      if (response.statusCode == 200) {
+        final data = jsonDecode(response.body);
+        final String text =
+            data["candidates"][0]["content"]["parts"][0]["text"];
+        return text.trim().split(" ")[0];
+      } else {
+        print("Gemini API Error: ${response.body}");
+        return "Medium"; // fallback priority
+      }
+    } catch (e) {
+      print("AI Priority Error: $e");
+      return "Medium"; // fallback if error occurs
     }
   }
 
@@ -58,23 +80,30 @@ class GeminiService {
     final apiKey = dotenv.env["GEMINI_API_KEY"];
     final url =
         "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-pro:generateContent?key=$apiKey";
+    final imageResponse = await http.get(Uri.parse(imageUrl));
+    if (imageResponse.statusCode != 200) {
+      throw Exception(
+        "Failed to fetch image from URL: ${imageResponse.statusCode}",
+      );
+    }
 
+    final base64Image = base64Encode(imageResponse.bodyBytes);
     final body = {
       "contents": [
         {
           "parts": [
             {
               "text":
-                  "You are validating a civic issue report. Check the following:\n"
-                  "1. Does the image clearly show the issue?\n"
-                  "2. Does the image content match the selected category?\n"
-                  "3. Ensure that the image is of the real-world scene and not a photo of another device screen.\n"
-                  "Return ONLY 'VALID' if all conditions are met, else 'INVALID'.",
+                  "You are validating a civic issue report. Don't be lenient and check the following:\n"
+                  "1. Does the image mostly show the issue?\n"
+                  "2. Does the image content roughly match the selected category?\n"
+                  "Return 'VALID' if it reasonably matches, else 'INVALID'. "
+                  "Do not be overly strict if the image is slightly unclear or partially obstructed.",
             },
             {"text": "Category: $category"},
             {"text": "Description: $description"},
             {
-              "file_data": {"file_uri": imageUrl},
+              "inline_data": {"mime_type": "image/jpeg", "data": base64Image},
             },
           ],
         },
