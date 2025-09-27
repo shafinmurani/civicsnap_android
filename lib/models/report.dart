@@ -43,7 +43,26 @@ class Report {
       "description": description,
       "category": category,
       "uid": uid, // Use the correct, consistent key
-      "uploadTime": uploadTime,
+      "uploadTime": Timestamp.fromDate(uploadTime),
+      "status": status,
+      "city": city,
+      "address": address,
+      "remarks": remarks,
+      "priority": priority,
+    };
+  }
+  
+  // For local storage serialization (using milliseconds instead of Timestamp)
+  Map<String, dynamic> toLocalJson() {
+    return {
+      "id": id,
+      "imageUrl": imageUrl,
+      "latitude": latitude,
+      "longitude": longitude,
+      "description": description,
+      "category": category,
+      "uid": uid,
+      "uploadTime": uploadTime.millisecondsSinceEpoch,
       "status": status,
       "city": city,
       "address": address,
@@ -63,6 +82,25 @@ class Report {
       category: json["category"] as String,
       uid: json["uid"] as String,
       uploadTime: (json["uploadTime"] as Timestamp).toDate(),
+      status: json["status"] as String,
+      city: json["city"] as String,
+      address: json["address"],
+      remarks: json["remarks"] as String,
+      priority: json["priority"] as String,
+    );
+  }
+  
+  // For local storage deserialization
+  factory Report.fromLocalJson(Map<String, dynamic> json) {
+    return Report(
+      id: json["id"],
+      imageUrl: json["imageUrl"] as String,
+      latitude: (json["latitude"] as num?)?.toDouble() ?? 0.0,
+      longitude: (json["longitude"] as num?)?.toDouble() ?? 0.0,
+      description: json["description"] as String,
+      category: json["category"] as String,
+      uid: json["uid"] as String,
+      uploadTime: DateTime.fromMillisecondsSinceEpoch(json["uploadTime"] as int),
       status: json["status"] as String,
       city: json["city"] as String,
       address: json["address"],

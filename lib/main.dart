@@ -1,5 +1,6 @@
 import 'package:civicsnap_android/firebase_options.dart';
 import 'package:civicsnap_android/router/router.dart';
+import 'package:civicsnap_android/services/upload_queue_service.dart';
 import 'package:civicsnap_android/themes/light.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
@@ -11,6 +12,9 @@ void main() async {
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
   await dotenv.load(fileName: ".env");
   await EasyLocalization.ensureInitialized();
+  
+  // Initialize upload queue service
+  await UploadQueueService().initialize();
 
   runApp(
     EasyLocalization(

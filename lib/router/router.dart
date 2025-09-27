@@ -1,6 +1,7 @@
 import 'package:civicsnap_android/pages/auth/auth_wrapper.dart';
 import 'package:civicsnap_android/pages/create_report_page.dart';
 import 'package:civicsnap_android/pages/my_reports_page.dart';
+import 'package:civicsnap_android/pages/queued_uploads_page.dart';
 import 'package:civicsnap_android/pages/report_details_page.dart';
 import 'package:civicsnap_android/pages/settings.dart';
 import 'package:go_router/go_router.dart';
@@ -22,6 +23,10 @@ final GoRouter router = GoRouter(
         GoRoute(
           path: "my-reports",
           builder: (context, state) => const MyReportsPage(),
+        ),
+        GoRoute(
+          path: "queued-uploads",
+          builder: (context, state) => const QueuedUploadsPage(),
         ),
         GoRoute(
           path: "report/:id",

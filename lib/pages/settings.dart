@@ -3,6 +3,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:civicsnap_android/components/error_snackbar.dart';
+import 'package:civicsnap_android/services/login_services.dart';
 import 'package:easy_localization/easy_localization.dart';
 
 class SettingsPage extends StatefulWidget {
@@ -15,6 +16,7 @@ class SettingsPage extends StatefulWidget {
 class _SettingsPageState extends State<SettingsPage> {
   User? user;
   bool isLoading = true;
+  final LoginServices _loginServices = LoginServices();
 
   final List<Locale> supportedLocales = const [
     Locale('en'),
@@ -81,6 +83,34 @@ class _SettingsPageState extends State<SettingsPage> {
     }
   }
 
+  Future<void> _showLogoutConfirmationDialog() async {
+    return showDialog<void>(
+      context: context,
+      barrierDismissible: false,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('confirmLogout'.tr()),
+          content: Text('logoutConfirmation'.tr()),
+          actions: <Widget>[
+            TextButton(
+              child: Text('cancel'.tr()),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+            TextButton(
+              child: Text('logoutButton'.tr()),
+              onPressed: () async {
+                Navigator.of(context).pop();
+                await _loginServices.logout(context);
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -144,6 +174,26 @@ class _SettingsPageState extends State<SettingsPage> {
                         child: Text(_getLanguageName(locale)),
                       );
                     }).toList(),
+                  ),
+                  const SizedBox(height: 32),
+                  Text(
+                    'accountTitle'.tr(),
+                    style: Theme.of(context).textTheme.titleLarge,
+                  ),
+                  const SizedBox(height: 16),
+                  Card(
+                    child: ListTile(
+                      leading: Icon(
+                        Icons.exit_to_app,
+                        color: Colors.red[600],
+                      ),
+                      title: Text(
+                        'logoutButton'.tr(),
+                        style: TextStyle(color: Colors.red[600]),
+                      ),
+                      subtitle: Text('logoutDescription'.tr()),
+                      onTap: _showLogoutConfirmationDialog,
+                    ),
                   ),
                 ],
               ),

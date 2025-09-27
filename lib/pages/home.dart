@@ -2,7 +2,6 @@ import 'dart:async';
 import 'package:civicsnap_android/components/error_snackbar.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:civicsnap_android/services/login_services.dart';
 import 'package:go_router/go_router.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:geolocator/geolocator.dart';
@@ -18,7 +17,6 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
   User? user;
   bool isLoading = true;
-  final LoginServices _loginServices = LoginServices();
   late StreamSubscription<ServiceStatus> _locationStreamSubscription;
   bool _isShowingDialog = false;
 
@@ -172,33 +170,6 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
     );
   }
 
-  Future<void> _showLogoutConfirmationDialog() async {
-    return showDialog<void>(
-      context: context,
-      barrierDismissible: false,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: Text('confirmLogout'.tr()),
-          content: Text('logoutConfirmation'.tr()),
-          actions: <Widget>[
-            TextButton(
-              child: Text('cancel'.tr()),
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-            ),
-            TextButton(
-              child: Text('logoutButton'.tr()),
-              onPressed: () async {
-                Navigator.of(context).pop();
-                await _loginServices.logout(context);
-              },
-            ),
-          ],
-        );
-      },
-    );
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -211,9 +182,9 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
         centerTitle: true,
         actions: [
           IconButton(
-            icon: const Icon(Icons.exit_to_app),
-            onPressed: _showLogoutConfirmationDialog,
-            tooltip: 'logoutButton'.tr(),
+            icon: const Icon(Icons.cloud_upload_outlined),
+            onPressed: () => context.go('/queued-uploads'),
+            tooltip: 'queuedUploads'.tr(),
           ),
         ],
       ),

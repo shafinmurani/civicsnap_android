@@ -1,7 +1,7 @@
 import 'dart:io';
 
 import 'package:civicsnap_android/models/report.dart';
-import 'package:civicsnap_android/services/db_services.dart';
+import 'package:civicsnap_android/services/upload_queue_service.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
@@ -146,9 +146,11 @@ class _CreateReportPageState extends State<CreateReportPage> {
     }
     if (_city == null) {
       if (mounted) showErrorSnackbar(context, 'locationNotAvailable'.tr());
+      return;
     }
     if (_descriptionController.text.isEmpty) {
       if (mounted) showErrorSnackbar(context, 'descriptionIsEmpty'.tr());
+      return;
     }
 
     if (mounted) setState(() => _isLoading = true);
@@ -171,15 +173,24 @@ class _CreateReportPageState extends State<CreateReportPage> {
         priority: "",
       );
 
-      await DbServices.uploadReport(report, _image!.path);
+      // Add to upload queue instead of direct upload
+      await UploadQueueService().addToQueue(report, _image!.path);
+      
       if (mounted) {
-        showErrorSnackbar(context, 'reportSuccess'.tr());
+        // Show success message for queuing
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('reportQueuedSuccess'.tr()),
+            backgroundColor: Colors.green,
+          ),
+        );
 
+        // Navigate back to home page immediately
         context.go('/');
       }
     } catch (e) {
       if (mounted) {
-        showErrorSnackbar(context, e.toString().split(": ")[1].tr());
+        showErrorSnackbar(context, 'failedToQueueReport'.tr());
       }
     } finally {
       if (mounted) {

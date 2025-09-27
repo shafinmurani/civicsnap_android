@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:io';
 import 'package:http/http.dart' as http;
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 
@@ -19,9 +20,8 @@ class GeminiService {
       // Step 1: Download image from the given URL
       final imageResponse = await http.get(Uri.parse(imageUrl));
       if (imageResponse.statusCode != 200) {
-        throw Exception(
-          "Failed to fetch image from URL: ${imageResponse.statusCode}",
-        );
+        // Localizable error key
+        throw Exception('errorFetchImageFromUrl');
       }
 
       // Step 2: Convert image bytes to base64
@@ -80,14 +80,28 @@ class GeminiService {
     final apiKey = dotenv.env["GEMINI_API_KEY"];
     final url =
         "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-pro:generateContent?key=$apiKey";
-    final imageResponse = await http.get(Uri.parse(imageUrl));
-    if (imageResponse.statusCode != 200) {
-      throw Exception(
-        "Failed to fetch image from URL: ${imageResponse.statusCode}",
-      );
+    
+    String base64Image;
+    
+    // Handle both local file paths and remote URLs
+    if (imageUrl.startsWith('http')) {
+      // Remote URL
+      final imageResponse = await http.get(Uri.parse(imageUrl));
+      if (imageResponse.statusCode != 200) {
+        // Localizable error key
+        throw Exception('errorFetchImageFromUrl');
+      }
+      base64Image = base64Encode(imageResponse.bodyBytes);
+    } else {
+      // Local file path
+      final file = File(imageUrl);
+      if (!await file.exists()) {
+        // Localizable error key for missing local image
+        throw Exception('errorImageFileNotFound');
+      }
+      final imageBytes = await file.readAsBytes();
+      base64Image = base64Encode(imageBytes);
     }
-
-    final base64Image = base64Encode(imageResponse.bodyBytes);
     final body = {
       "contents": [
         {
@@ -122,7 +136,8 @@ class GeminiService {
           .toUpperCase();
       return text.contains("TRUE");
     } else {
-      throw Exception('validationErr');
+      // Treat non-200 as server error rather than validation failure
+      throw Exception('serverError');
     }
   }
 }
